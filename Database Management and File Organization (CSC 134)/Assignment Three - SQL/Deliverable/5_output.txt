@@ -1,0 +1,195 @@
+﻿By: 	Chris Neal
+Date: 	11/26/13
+Section:02
+
+QUERY 1:
+1.	List the cars (license, model and year, Amount_of_Damage) that have been involved in any accidents. 
+	Order the result by license in descending order.
+
+SELECT C.License, C.Model, C.Year, A.Amount_of_Damage
+FROM CAR AS C, HAD AS H, ACCIDENT AS A
+WHERE C.License=H.License AND H.AccidentNo=A.Accident_no;	
+
+mysql> SELECT C.License, C.Model, C.Year, A.Amount_of_Damage
+    -> FROM CAR AS C, HAD AS H, ACCIDENT AS A
+    -> WHERE C.License=H.License AND H.AccidentNo=A.Accident_no;
++-----------------+--------------+------+------------------+
+| License         | Model        | Year | Amount_of_Damage |
++-----------------+--------------+------+------------------+
+| 111111111111111 | Mustang      | 1965 | 9999999999999.99 |
+| 333333333333333 | Honda Accord | 1999 |           300.25 |
+| 444444444444444 | Honda Accord | 1992 |           100.25 |
+| 555555555555555 | Telsa        | 2013 | 9999999999999.99 |
+| 666666666666666 | Honda Accord | 2013 |           500.25 |
++-----------------+--------------+------+------------------+
+5 rows in set (0.00 sec)
+
+
+
+QUERY 2:
+2.	List the cars that have more than two accidents. List license and number of accidents.
+
+SELECT License, Accident_no
+FROM HAD AS H, ACCIDENT AS A
+WHERE A.Accident_No>2 AND A.Accident_No=H.AccidentNo;
+
+
+mysql> SELECT License, Accident_no
+    -> FROM HAD AS H, ACCIDENT AS A
+    -> WHERE A.Accident_No>2 AND A.Accident_No=H.AccidentNo;
++-----------------+-------------+
+| License         | Accident_no |
++-----------------+-------------+
+| 444444444444444 |           3 |
+| 555555555555555 |           4 |
+| 666666666666666 |           5 |
++-----------------+-------------+
+3 rows in set (0.00 sec)
+
+
+
+QUERY 3:
+3.	List information (driver name, amount of damage, license, model and SSN) about the accidents 
+	in which the owner of the car are involved i.e., the Driver_Name and Customer_Name are the same.
+
+SELECT A.Driver_Name, A.Amount_of_Damage, H.License, C2.Model, O.SSN
+FROM CUSTOMER AS C1, OWNS AS O, CAR AS C2, HAD AS H, ACCIDENT AS A 
+WHERE C1.Customer_Name=A.Driver_Name AND (O.License=C2.License AND H.License = C2.License AND A.Accident_No=H.AccidentNo);
+
+mysql> SELECT A.Driver_Name, A.Amount_of_Damage, H.License, C2.Model, O.SSN FROM CUSTOMER AS C1, OWNS AS O, CAR AS C2, HAD AS H, ACCIDENT AS A  
+WHERE C1.Customer_Name=A.Driver_Name AND (O.License=C2.License AND H.License = C2.License AND A.Accident_No=H.AccidentNo);
++----------------+------------------+-----------------+--------------+-----------+
+| Driver_Name    | Amount_of_Damage | License         | Model        | SSN       |
++----------------+------------------+-----------------+--------------+-----------+
+| Joe Smith      | 9999999999999.99 | 111111111111111 | Mustang      | 111111111 |
+| Phil Arnold    |           300.25 | 333333333333333 | Honda Accord | 333333333 |
+| Mary Arnold    |           100.25 | 444444444444444 | Honda Accord | 444444444 |
+| Jessica Smith  |        250000.50 | 555555555555555 | Telsa        | 222222222 |
+| Steve McDonald |           500.25 | 666666666666666 | Honda Accord | 666666666 |
++----------------+------------------+-----------------+--------------+-----------+
+5 rows in set (0.00 sec)
+
+
+	
+QUERY 4:
+4.	Obtain the information of any policy (policy number, policy rate and policy details) whose 
+	policy rate is higher than the rate of policy number 12.
+	
+SELECT P.PolicyNo, P.Policy_Rate, P.Policy_Details
+FROM POLICY AS P
+WHERE P.Policy_Rate>(SELECT P2.Policy_Rate FROM POLICY AS P2 WHERE P2.PolicyNo=12);
+	
+mysql> SELECT P.PolicyNo, P.Policy_Rate, P.Policy_Details
+    -> FROM POLICY AS P
+    -> WHERE P.Policy_Rate>(SELECT P2.Policy_Rate FROM POLICY AS P2 WHERE P2.PolicyNo=12);
++----------+------------------+-----------------+
+| PolicyNo | Policy_Rate      | Policy_Details  |
++----------+------------------+-----------------+
+|        1 | 9999999999999.99 | Full Coverage   |
+|        2 |       1000000.00 | Deluxe Coverage |
++----------+------------------+-----------------+
+2 rows in set (0.00 sec)
+	
+	
+	
+QUERY 5:
+5.	Consider all policies, list the lowest rate, highest rate, and average rate.
+
+SELECT MIN(P1.Policy_Rate), MAX(P1.Policy_Rate), AVG(P1.Policy_Rate)
+FROM POLICY AS P1;
+
+mysql> SELECT MIN(P1.Policy_Rate), MAX(P1.Policy_Rate), AVG(P1.Policy_Rate)
+    -> FROM POLICY AS P1;
++---------------------+---------------------+----------------------+
+| MIN(P1.Policy_Rate) | MAX(P1.Policy_Rate) | AVG(P1.Policy_Rate)  |
++---------------------+---------------------+----------------------+
+|               10.00 |    9999999999999.99 | 3333333666669.996667 |
++---------------------+---------------------+----------------------+
+1 row in set (0.00 sec)
+
+
+
+QUERY 6:
+6.	Get information (accident number, driver name, accident date and amount of damage) of the accident 
+	which has the highest amount of damage among all the accidents.
+	
+SELECT Accident_no, Driver_name, Accident_Date, MAX(Amount_of_Damage)
+FROM ACCIDENT;
+
+mysql> SELECT Accident_no, Driver_name, Accident_Date, MAX(Amount_of_Damage) FROM ACCIDENT;
++-------------+-------------+---------------+-----------------------+
+| Accident_no | Driver_name | Accident_Date | MAX(Amount_of_Damage) |
++-------------+-------------+---------------+-----------------------+
+|           1 | Joe Smith   | 2000-05-14    |      9999999999999.99 |
++-------------+-------------+---------------+-----------------------+
+1 row in set (0.00 sec)
+
+
+
+QUERY 7:
+7.	Get the information (customer name, city and state) about the customers who own cars with the model 
+	of ‘Honda Accord’. Also get those cars’ license, and year made.
+	
+SELECT C1.Customer_Name, C1.City, C1.State, C2.License, C2.Year
+FROM CUSTOMER AS C1, CAR AS C2, OWNS AS O
+WHERE C1.SSN=O.SSN AND O.License=C2.License AND C2.Model='Honda Accord';
+		
+mysql> SELECT C1.Customer_Name, C1.City, C1.State, C2.License, C2.Year
+    -> FROM CUSTOMER AS C1, CAR AS C2, OWNS AS O
+    -> WHERE C1.SSN=O.SSN AND O.License=C2.License AND C2.Model='Honda Accord';
++----------------+-----------+------------+-----------------+------+
+| Customer_Name  | City      | State      | License         | Year |
++----------------+-----------+------------+-----------------+------+
+| Phil Arnold    | Roseville | California | 333333333333333 | 1999 |
+| Mary Arnold    | Sunrise   | California | 444444444444444 | 1992 |
+| Steve McDonald | Sunrise   | California | 666666666666666 | 2013 |
++----------------+-----------+------------+-----------------+------+
+3 rows in set (0.01 sec)
+
+
+
+QUERY 8:
+8.	Retrieve the customers’ information (SSN, customer name, street, city, state and zip) who live either 
+	in ‘Roseville’ or ‘Sunrise’. (‘Roseville’ and ‘Sunrise’ are city names)
+	
+SELECT SSN, Customer_Name, Street, City, State, Zip
+FROM CUSTOMER
+WHERE City='Roseville' OR City='Sunrise';
+
+mysql> SELECT SSN, Customer_Name, Street, City, State, Zip
+    -> FROM CUSTOMER
+    -> WHERE City='Roseville' OR City='Sunrise';
++-----------+----------------+---------------+-----------+------------+-------+
+| SSN       | Customer_Name  | Street        | City      | State      | Zip   |
++-----------+----------------+---------------+-----------+------------+-------+
+| 333333333 | Phil Arnold    | Oak Street    | Roseville | California | 95747 |
+| 444444444 | Mary Arnold    | Sunrise Blvd. | Sunrise   | California | 95848 |
+| 666666666 | Steve McDonald | Sunrise Blvd. | Sunrise   | California | 95848 |
++-----------+----------------+---------------+-----------+------------+-------+
+3 rows in set (0.00 sec)
+
+
+
+QUERY 9:
+9.	Retrieve policies that cover more than 2 cars.  List policy number and number of cars covered. 
+
+SELECT PolicyNo_Ref, numCount
+FROM( SELECT PolicyNo_Ref, 
+      COUNT(PolicyNo_Ref) AS numCount 
+	  FROM CAR 
+	  GROUP BY PolicyNo_Ref ) as TEMP_TABLE 
+WHERE numCount > 2;
+
+mysql> SELECT PolicyNo_Ref, numCount
+    -> FROM( SELECT PolicyNo_Ref,
+    ->       COUNT(PolicyNo_Ref) AS numCount
+    ->   FROM CAR
+    ->   GROUP BY PolicyNo_Ref ) as TEMP_TABLE
+    -> WHERE numCount > 2;
++--------------+----------+
+| PolicyNo_Ref | numCount |
++--------------+----------+
+|           12 |        3 |
++--------------+----------+
+1 row in set (0.00 sec)
+
